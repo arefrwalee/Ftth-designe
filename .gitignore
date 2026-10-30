@@ -1,0 +1,18 @@
+# بيانات الدراسات لا تُرفع أبداً
+*.gpkg
+*.qgz
+*.xlsx
+*.xls
+*.docx
+*.pdf
+*.kml
+*.kmz
+*.zip
+*_10y/
+نتائج_التحديث/
+study.json
+python/
+dist/
+build/
+__pycache__/
+*.pyc

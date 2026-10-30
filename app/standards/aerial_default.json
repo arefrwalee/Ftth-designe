@@ -1,0 +1,112 @@
+{
+ "_comment": "معايير مصمم الدراسات الهوائية. كل قيمة هنا كانت ثابتة داخل الكود. يمكن لأي دراسة تجاوز أي مفتاح عبر overrides في study.json (دمج عميق).",
+ "name": "aerial_default",
+ "version": 1,
+
+ "design": {
+  "_note": "مولّد الشبكة (المرحلة 3). كل قيمة تُجاوَز عبر overrides.design في study.json",
+  "secondary": {"max_buildings": 6, "max_radius_m": 120, "component_gap_m": 80},
+  "primary": {"max_secondaries": 6, "max_radius_m": 250, "component_gap_m": 200},
+  "cable_sizing": {"branch_sizes": [4, 8, 12, 24, 48], "main_sizes": [4, 8, 12, 24, 48, 72, 96, 144, 288], "growth": 1.62, "main_strict": true},
+  "snap_pole_m": 30, "max_drop_m": 80, "max_refine_rounds": 0, "max_seconds": 300
+ },
+
+ "layers": {
+  "main_cables": "الكوابل_الرئيسية",
+  "branch_cables": "الكوابل_الفرعية",
+  "primary_splitters": "السبلترات_الرئيسية",
+  "secondary_splitters": "السبلترات_الفرعية",
+  "closure_main": "كلوجرات_تفرع_رئيسي",
+  "closure_branch": "كلوجرات_تفرع_فرعي",
+  "closure_merge": "كلوجرات_دمج_فصل",
+  "center": "المركز",
+  "poles": "الأعمدة",
+  "buildings": "المباني"
+ },
+
+ "boq_labels": {
+  "cable_main": "كابل رئيسي",
+  "cable_branch": "كابل فرعي",
+  "primary_splitter": "سبلتر 1:8 رئيسي",
+  "secondary_splitter": "سبلتر 1:8 فرعي",
+  "closure": "كلوجر وصل هوائي",
+  "gpon_card": "بطاقة GPON",
+  "odf": "موزع ألياف",
+  "patch_cord": "Patch cord",
+  "storage_cross": "صليب تخزين",
+  "hanging": "مواد تعليق"
+ },
+
+ "spare": {
+  "splitters_closures": 1.2,
+  "_note": "احتياط 20% مدمج في كميات السبلترات الرئيسية/الفرعية والكلوجرات وPatch cord وصليب التخزين: ceil(net*1.2)"
+ },
+ "cable_order_factor": 1.2,
+ "contingency": 0.05,
+
+ "splitter": {"ports": 8, "min_spare_ports": 2},
+ "pon": {"extra_ports": 4, "ports_per_card": 16},
+ "odf": {"fibres_per_panel": 48, "root_radius_m": 10},
+
+
+ "poles": {
+  "span_m": 40.0, "corner_deg": 20.0, "dedup_m": 8.0,
+  "_note": "span_m/corner_deg/dedup_m = الطريقة التقديرية (عمود كل span_m + الزوايا + إزالة المكرر) وتُستعمل فقط عند غياب طبقة أعمدة من المسح.",
+  "survey": {
+   "layer": "الأعمدة",
+   "fields": {
+    "id": ["Pole_ID", "ID", "Name", "الرقم", "رقم_العمود"],
+    "type": ["Type", "النوع"],
+    "role": ["Role", "الدور"],
+    "height": ["Height", "الارتفاع"],
+    "lon": ["lon", "lng", "long", "longitude", "خط_الطول"],
+    "lat": ["lat", "latitude", "خط_العرض"],
+    "x": ["x", "easting"],
+    "y": ["y", "northing"]
+   },
+   "type_values": {"existing": ["موجود", "قائم", "existing", "exist"], "new": ["جديد", "new"]},
+   "role_values": {"stay": ["شدّادة", "شدادة", "stay", "anchor"], "mid": ["وسطي", "وسطية", "mid", "intermediate"], "branch": ["تفرع", "تفريع", "branch", "tap"]},
+   "max_span_m": 50.0,
+   "pole_to_cable_m": 8.0,
+   "duplicate_m": 1.0,
+   "_note": "max_span_m قيمة مؤقتة بانتظار تأكيد (تنبيه فقط لا يوقف التشغيل). أسماء الحقول وقيم النوع/الدور مقبولة بالعربية أو الإنجليزية؛ الغموض في مخرجات تطبيق المسح يُحسم بعد وصول عيّنة منه."
+  }
+ },
+
+ "snap": {"olt_m": 50.0, "closure_m": 6.0, "splitter_to_cable_m": 80.0, "validate_splitter_to_cable_m": 5.0},
+
+ "loss": {
+  "fibre_db_per_km": 0.35, "splitter_db": 9.9, "splitter_count": 2,
+  "splice_db": 0.1, "connector_db": 0.5, "connector_count": 3,
+  "margin_db": 3.0, "fixed_splices": 6, "path_factor": 1.2,
+  "class_c_plus_db": 32.0, "class_b_plus_db": 28.0,
+  "target_text": "أقل من 25", "target_avg_db": 25.0
+ },
+
+ "hanging_materials": {
+  "mode": "manual",
+  "_note": "manual (القاعدة المعتمدة) = يدخل الرقم الشخص الذي يجري الدراسة في خلية الكمية ببند مواد التعليق في قالب BOQ، والأداة لا تغيّره أبداً. by_cable_length = خيار غير مفعّل افتراضياً: ceil(مجموع طول الكبلات المطلوبة / span_m / round_to) * round_to."
+ },
+ "hanging_by_cable_length": {"span_m": 20.0, "round_to": 100},
+
+ "crs": {"utm_zone": 37},
+
+ "offer": {
+  "first_party": "الطرف الأول",
+  "second_party": "الطرف الثاني",
+  "brand_ar": "", "brand_en": "",
+  "design": {"ink": "1A1A1A", "mute": "6B6B6B", "line": "C9CED6", "accent": "14284B", "soft": "F3F5F8", "gold": "B8893B", "soft2": "E4E9F2", "font": "Segoe UI"}
+ },
+
+ "console": {"arabic_shaping": "auto", "_note": "auto = وصل الحروف وعكس الاتجاه عند الطباعة في نافذة cmd على Windows فقط؛ true/false لفرضه أو إيقافه. الملفات (run_summary.txt وغيرها) تحفظ النص العربي الأصلي دائماً."},
+
+ "outputs": {
+  "loss_budget_xlsx": false,
+  "change_report": true,
+  "client_xlsx": true,
+  "client_docx": true,
+  "link_table": true,
+  "kml": true,
+  "poles_audit_xlsx": true
+ }
+}

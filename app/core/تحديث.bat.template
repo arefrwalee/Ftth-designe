@@ -1,0 +1,33 @@
+@echo off
+chcp 65001 >nul
+set PYTHONIOENCODING=utf-8
+cd /d "%~dp0"
+rem FTTH_DESIGNER env var if set, else the folder next to the *_10y study folders
+if defined FTTH_DESIGNER (set "DES=%FTTH_DESIGNER%") else (set "DES=%~dp0..\..\مصمم_الدراسات_الهوائية")
+if not exist "%DES%\core\ftth_update.py" (
+  echo ERROR: designer folder not found. Put the folder "مصمم_الدراسات_الهوائية" next to the *_10y study folders,
+  echo        or set the environment variable FTTH_DESIGNER to its path.
+  pause & exit /b 1
+)
+set PY=%USERPROFILE%\ftth_env\Scripts\python.exe
+if exist "%PY%" goto run
+set PY=%~dp0.venv\Scripts\python.exe
+if exist "%PY%" goto run
+echo Python environment is not set up yet.
+echo Run the setup .bat file inside the FTTH_Update_Setup folder first, then run this file again.
+echo (Or press any key to try installing from the internet now.)
+pause
+where py >nul 2>nul
+if errorlevel 1 (
+  echo Python was not found. Install it from python.org and tick "Add Python to PATH", then run again.
+  pause & exit /b 1
+)
+py -m venv "%~dp0.venv"
+"%~dp0.venv\Scripts\python.exe" -m pip install --quiet shapely numpy openpyxl
+set PY=%~dp0.venv\Scripts\python.exe
+:run
+"%PY%" -c "import docx" 2>nul || "%PY%" -m pip install --quiet python-docx
+"%PY%" "%DES%\core\ftth_update.py" --study "%~dp0." %*
+echo.
+echo Full summary (original Arabic text) is saved in run_summary.txt inside the newest results folder.
+pause
