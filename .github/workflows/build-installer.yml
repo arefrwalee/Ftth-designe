@@ -1,0 +1,49 @@
+name: build-installer
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Portable Python (python-build-standalone, includes tkinter)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $rel = gh api repos/astral-sh/python-build-standalone/releases/latest | ConvertFrom-Json
+          $a = $rel.assets | Where-Object { $_.name -match '^cpython-3\.12\.\d+\+\d+-x86_64-pc-windows-msvc-install_only\.tar\.gz$' } | Select-Object -First 1
+          if (-not $a) { throw 'no python build found' }
+          Invoke-WebRequest $a.browser_download_url -OutFile py.tar.gz
+          mkdir stage | Out-Null
+          tar -xzf py.tar.gz -C stage
+          .\stage\python\python.exe -m pip install --no-warn-script-location -r requirements.txt
+      - name: Copy app
+        shell: pwsh
+        run: |
+          Copy-Item -Recurse app stage\app
+          Copy-Item README.md stage\README.txt
+      - name: Smoke test
+        shell: pwsh
+        run: |
+          .\stage\python\python.exe -c "import shapely, numpy, openpyxl, docx, PIL, matplotlib, lxml, tkinter; print('imports ok')"
+          .\stage\python\python.exe stage\app\core\ftth_boq.py -h
+          $p = Start-Process .\stage\python\python.exe -ArgumentList '-X','utf8','stage\app\core\ftth_web.py','--no-window' -RedirectStandardOutput web.out -PassThru
+          Start-Sleep 4
+          $url = (Get-Content web.out | Select-Object -First 1)
+          (Invoke-WebRequest "${url}api/state" -UseBasicParsing).Content
+          Stop-Process $p
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup -y --no-progress
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $env:APP_VERSION = '1.0'
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\setup.iss
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Setup_FTTH_Aerial_Designer
+          path: dist/Setup_FTTH_Aerial_Designer.exe

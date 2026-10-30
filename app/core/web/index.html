@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مصمم الدراسات الهوائية</title>
+<style>
+:root{--navy:#14284B;--navy2:#1d3a6b;--gold:#B8893B;--bg:#F3F5F8;--card:#fff;--ink:#1A1A1A;--mute:#6B6B6B;--line:#D9DEE6;--ok:#1E8E5A;--bad:#C0392B;--soft:#E4E9F2;--yellow:#FFF6CC}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;display:flex;height:100vh;overflow:hidden}
+aside{width:236px;background:var(--navy);color:#fff;display:flex;flex-direction:column;flex:none}
+.brand{padding:26px 20px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.brand b{display:block;font-size:19px;line-height:1.4}.brand span{font-size:12px;color:#AEB8CC;letter-spacing:.5px}
+.brand i{display:block;width:34px;height:3px;background:var(--gold);margin-top:12px;border-radius:2px}
+nav{padding:14px 10px;flex:1}
+nav button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;color:#D5DCEA;padding:12px 14px;border-radius:10px;font:inherit;cursor:pointer;margin-bottom:4px;text-align:right}
+nav button:hover{background:rgba(255,255,255,.07)}
+nav button.on{background:#fff;color:var(--navy);font-weight:700}
+nav svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.foot{padding:14px 20px;font-size:12px;color:#8E9AB4;border-top:1px solid rgba(255,255,255,.12)}
+main{flex:1;overflow:auto;padding:30px 36px 40px}
+h1{margin:0 0 4px;font-size:24px;color:var(--navy)}.sub{color:var(--mute);margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 2px rgba(20,40,75,.04)}
+.card h3{margin:0 0 14px;font-size:16px;color:var(--navy)}
+label{display:block;font-weight:600;margin-bottom:6px;font-size:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{margin-bottom:16px}
+input[type=text],input[type=number],select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--navy2);outline-offset:-1px;border-color:var(--navy2)}
+.pick{display:flex;gap:8px}.pick input{flex:1;direction:ltr;text-align:left}
+.hint{font-size:12.5px;color:var(--mute);margin-top:5px}
+button.btn{background:var(--navy);color:#fff;border:0;border-radius:10px;padding:11px 22px;font:inherit;font-weight:700;cursor:pointer}
+button.btn:hover{background:var(--navy2)}button.btn:disabled{opacity:.5;cursor:default}
+button.alt{background:#fff;color:var(--navy);border:1px solid var(--navy);font-weight:600}button.alt:hover{background:var(--soft)}
+button.gold{background:var(--gold)}button.gold:hover{background:#a37731}
+.steps{display:flex;gap:10px;margin:4px 0 14px}.step{flex:1;padding:10px 12px;border-radius:10px;background:var(--soft);color:var(--mute);font-size:13px;font-weight:600;border:1px solid transparent}
+.step.run{background:#FFF3D6;color:#7a5410;border-color:var(--gold)}.step.done{background:#DDF3E8;color:var(--ok)}.step.fail{background:#F9DEDA;color:var(--bad)}
+pre#log{background:#0F1B33;color:#D6E0F5;border-radius:10px;padding:14px;height:260px;overflow:auto;font:12.5px/1.65 Consolas,"Cascadia Mono",monospace;white-space:pre-wrap;unicode-bidi:plaintext;text-align:start;margin:0}
+.msg{padding:12px 16px;border-radius:10px;margin:12px 0;font-weight:600}.msg.ok{background:#DDF3E8;color:var(--ok)}.msg.bad{background:#F9DEDA;color:var(--bad)}.msg.info{background:var(--soft);color:var(--navy)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--navy);color:#fff;padding:9px 10px;font-weight:600;position:sticky;top:0}
+td{padding:6px 10px;border-bottom:1px solid var(--line)}td.n{text-align:center;color:var(--mute)}
+td input{padding:6px 8px;text-align:center;direction:ltr;background:var(--yellow);border-color:#ECD98A}
+.scroll{max-height:440px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.tot{display:flex;gap:26px;margin-top:14px;font-weight:700;color:var(--navy)}
+.hide{display:none}.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-block;background:var(--soft);color:var(--navy);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+</style></head>
+<body>
+<aside>
+ <div class="brand"><b>مصمم الدراسات الهوائية</b><span>AERIAL FTTH STUDY DESIGNER</span><i></i></div>
+ <nav id="nav">
+  <button data-p="new" class="on"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>دراسة جديدة</button>
+  <button data-p="upd"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg>تحديث دراسة</button>
+  <button data-p="price"><svg viewBox="0 0 24 24"><path d="M12 3v18M16 7.5c0-1.7-1.8-3-4-3s-4 1.3-4 3 1.8 2.5 4 3 4 1.3 4 3-1.8 3-4 3-4-1.3-4-3"/></svg>الأسعار والمدخلات</button>
+  <button data-p="set"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.6a7 7 0 0 0-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2l.4 2.6h4l.4-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg>الإعدادات</button>
+ </nav>
+ <div class="foot">الإصدار 1.0</div>
+</aside>
+<main>
+<!-- new -->
+<section id="p-new">
+ <h1>دراسة جديدة</h1><p class="sub">من ملف المباني والطرق إلى دراسة كاملة: تصميم الشبكة والأعمدة وجداول الكميات ومشروع QGIS.</p>
+ <div class="card">
+  <h3>بيانات الدراسة</h3>
+  <div class="field"><label>ملف البيانات (GeoPackage) فيه المباني والطرق والمركز</label>
+   <div class="pick"><input type="text" id="n-in" readonly placeholder="اختر الملف..."><button class="btn alt" onclick="pickFile('n-in','اختر ملف GeoPackage','GeoPackage','*.gpkg')">استعراض</button></div></div>
+  <div class="row">
+   <div class="field"><label>اسم البلدة بالعربية</label><input type="text" id="n-town" placeholder="مثال: سلقين"></div>
+   <div class="field"><label>اسم قصير بالأحرف اللاتينية</label><input type="text" id="n-name" placeholder="Salqin" style="direction:ltr;text-align:left"><div class="hint">يُستعمل في أسماء الملفات والمجلد</div></div>
+  </div>
+  <div class="field"><label>طبقة أعمدة المسح الميداني (اختياري)</label>
+   <div class="pick"><input type="text" id="n-poles" readonly placeholder="بلا: تُقترح الأعمدة تلقائياً"><button class="btn alt" onclick="pickFile('n-poles','اختر ملف الأعمدة','CSV أو GeoPackage','*.csv *.gpkg')">استعراض</button><button class="btn alt" onclick="document.getElementById('n-poles').value=''">مسح</button></div></div>
+  <div class="actions"><button class="btn gold" id="n-go" onclick="runFull()">ابدأ الدراسة الكاملة</button></div>
+ </div>
+ <div class="card hide" id="n-prog">
+  <h3>التقدم</h3>
+  <div class="steps"><div class="step" id="s1">1 · تصميم الشبكة</div><div class="step" id="s2">2 · مجلد الدراسة</div><div class="step" id="s3">3 · الكميات والعرض</div><div class="step" id="s4">4 · مشروع QGIS</div></div>
+  <pre id="log"></pre>
+  <div id="n-res"></div>
+ </div>
+</section>
+<!-- update -->
+<section id="p-upd" class="hide">
+ <h1>تحديث دراسة</h1><p class="sub">بعد مراجعتك التصميم في QGIS: أعد حساب الكميات والفقد والعرض والملفات.</p>
+ <div class="card">
+  <div class="field"><label>الدراسة</label><select id="u-st"></select></div>
+  <div class="field"><label>ملف أعمدة المسح (اختياري)</label>
+   <div class="pick"><input type="text" id="u-poles" readonly placeholder="بلا"><button class="btn alt" onclick="pickFile('u-poles','اختر ملف الأعمدة','CSV أو GeoPackage','*.csv *.gpkg')">استعراض</button><button class="btn alt" onclick="document.getElementById('u-poles').value=''">مسح</button></div></div>
+  <div class="actions"><button class="btn gold" id="u-go" onclick="runUpd()">تحديث الآن</button><button class="btn alt" onclick="openRes()">فتح آخر نتائج</button><button class="btn alt" onclick="openStudy()">فتح مجلد الدراسة</button></div>
+ </div>
+ <div class="card hide" id="u-prog"><h3>المخرجات</h3><pre id="ulog"></pre><div id="u-res"></div></div>
+</section>
+<!-- prices -->
+<section id="p-price" class="hide">
+ <h1>الأسعار والمدخلات</h1><p class="sub">الكميات من التصميم. أدخل هنا ما يتحدد بعد الدراسة الفنية: الأشهر والأسعار.</p>
+ <div class="card"><div class="field" style="margin:0"><label>الدراسة</label><select id="p-st" onchange="loadPrices()"></select></div></div>
+ <div id="p-body"></div>
+</section>
+<!-- settings -->
+<section id="p-set" class="hide">
+ <h1>الإعدادات</h1><p class="sub">مكان حفظ الدراسات.</p>
+ <div class="card"><div class="field"><label>مجلد الدراسات</label><div class="pick"><input type="text" id="s-ws" readonly><button class="btn alt" onclick="pickWs()">تغيير</button><button class="btn alt" onclick="api('/api/open',{what:'workspace'})">فتح</button></div>
+ <div class="hint">كل دراسة جديدة تُنشأ في مجلد خاص بها هنا.</div></div></div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+async function api(u,d){const r=await fetch(u,d===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});return r.json()}
+setInterval(()=>fetch('/api/ping').catch(()=>{}),3000);fetch('/api/ping');
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x===b));
+ ['new','upd','price','set'].forEach(p=>$('p-'+p).classList.toggle('hide',p!==b.dataset.p));if(b.dataset.p==='price'||b.dataset.p==='upd')refresh().then(()=>b.dataset.p==='price'&&loadPrices())});
+let ST=[];
+async function refresh(){const s=await api('/api/state');ST=s.studies;$('s-ws').value=s.workspace;
+ for(const id of ['u-st','p-st']){const cur=$(id).value;$(id).innerHTML=ST.map(x=>`<option value="${x.name}">${x.town} (${x.name})${x.generic?'':' — قديمة'}</option>`).join('')||'<option value="">لا توجد دراسات بعد</option>';if(cur)$(id).value=cur}}
+async function pickFile(id,t,l,p){const r=await api('/api/pick',{kind:'file',title:t,label:l,pattern:p});if(r.path)$(id).value=r.path}
+async function pickWs(){const r=await api('/api/pick',{kind:'folder',title:'مجلد الدراسات'});if(r.path){await api('/api/settings',{workspace:r.path});refresh()}}
+async function poll(id,logEl,onLine){let n=0;for(;;){const r=await api('/api/job?id='+id+'&since='+n);n=r.next;r.lines.forEach(l=>{logEl.textContent+=l+'\n';onLine&&onLine(l)});logEl.scrollTop=logEl.scrollHeight;if(r.done)return r.code;await new Promise(z=>setTimeout(z,500))}}
+function setStep(i,c){const e=$('s'+i);e.className='step '+c}
+async function runFull(){
+ const inp=$('n-in').value,town=$('n-town').value.trim(),name=$('n-name').value.trim();
+ if(!inp||!town||!/^[A-Za-z][A-Za-z0-9_]*$/.test(name)){alert('أكمل الحقول: الملف، اسم البلدة، والاسم اللاتيني (أحرف وأرقام فقط).');return}
+ $('n-prog').classList.remove('hide');$('log').textContent='';$('n-res').innerHTML='';[1,2,3,4].forEach(i=>setStep(i,''));$('n-go').disabled=true;
+ const r=await api('/api/run',{job:'full',input:inp,name,town,poles:$('n-poles').value});if(r.error){alert(r.error);$('n-go').disabled=false;return}
+ let cur=0;const code=await poll(r.id,$('log'),l=>{const m=l.match(/^== (\d)\/4/);if(m){if(cur)setStep(cur,'done');cur=+m[1];setStep(cur,'run')}});
+ $('n-go').disabled=false;
+ if(code===0){[1,2,3,4].forEach(i=>setStep(i,'done'));await refresh();
+  $('n-res').innerHTML=`<div class="msg ok">تمت الدراسة. أدخل الآن الأشهر والأسعار من «الأسعار والمدخلات».</div><div class="actions"><button class="btn" onclick="gotoPrice('${name}')">الأسعار والمدخلات</button><button class="btn alt" onclick="api('/api/open',{what:'study',name:'${name}'})">فتح مجلد الدراسة</button></div>`}
+ else{if(cur)setStep(cur,'fail');$('n-res').innerHTML='<div class="msg bad">توقفت العملية. راجع الرسائل أعلاه.</div>'}}
+function gotoPrice(n){document.querySelector('[data-p=price]').click();setTimeout(()=>{$('p-st').value=n;loadPrices()},300)}
+async function runUpd(){const n=$('u-st').value;if(!n)return;$('u-prog').classList.remove('hide');$('ulog').textContent='';$('u-res').innerHTML='';$('u-go').disabled=true;
+ const r=await api('/api/run',{job:'update',name:n,poles:$('u-poles').value});const code=await poll(r.id,$('ulog'));$('u-go').disabled=false;
+ $('u-res').innerHTML=code===0?'<div class="msg ok">تم التحديث.</div>':'<div class="msg bad">توقف التحديث. أصلح الأخطاء في QGIS ثم أعد المحاولة.</div>'}
+function openRes(){api('/api/open',{what:'results',name:$('u-st').value})}function openStudy(){api('/api/open',{what:'study',name:$('u-st').value})}
+const IN=[['months','أشهر العمل','شهر'],['fuel','أشهر المحروقات (فارغ = نفس أشهر العمل)','شهر'],['excavation','الحفر','م'],['manholes','غرف التفتيش','عدد'],['hanging','مواد التعليق والتثبيت (مقترح، عدّله)','عدد']];
+let D=null;
+async function loadPrices(){const n=$('p-st').value,b=$('p-body');if(!n){b.innerHTML='<div class="card">أنشئ دراسة أولاً.</div>';return}
+ D=await api('/api/study?name='+encodeURIComponent(n));
+ if(!D.generic){b.innerHTML='<div class="card"><span class="pill">دراسة قديمة</span><p>هذه الدراسة من قالب سابق: تعدَّل الأسعار مباشرة في ملف BOQ.</p></div>';return}
+ b.innerHTML=`<div class="card"><h3>مدخلات الدراسة</h3><div class="row" style="grid-template-columns:repeat(3,1fr)">${IN.map(([k,l,u])=>`<div class="field"><label>${l} (${u})</label><input type="number" min="0" step="any" id="in-${k}" value="${D.inputs[k]??''}"></div>`).join('')}</div></div>
+ <div class="card"><h3>أسعار الوحدة (USD)</h3><div class="actions" style="margin-bottom:12px"><button class="btn alt" onclick="copyReal()">نسخ أسعار العرض الحقيقي إلى عرض الشركة</button><span class="hint">اترك الخلية فارغة لما لم يُسعَّر بعد.</span></div>
+ <div class="scroll"><table><thead><tr><th>البند</th><th>الوحدة</th><th>الكمية الآن</th><th>بعد 10 سنوات</th><th>العرض الحقيقي</th><th>عرض الشركة</th></tr></thead><tbody>${D.items.map((it,i)=>`<tr><td>${it.label}</td><td class="n">${it.unit}</td><td class="n">${it.q1??'من المدخلات'}</td><td class="n">${it.q10??'—'}</td><td><input type="number" min="0" step="any" data-k="real" data-l="${it.label}" value="${D.prices.real[it.label]??''}" oninput="tot()"></td><td><input type="number" min="0" step="any" data-k="company" data-l="${it.label}" value="${D.prices.company[it.label]??''}" oninput="tot()"></td></tr>`).join('')}</tbody></table></div>
+ <div class="tot" id="tot"></div></div>
+ <div class="actions"><button class="btn gold" onclick="savePrices(false)">حفظ</button><button class="btn" onclick="savePrices(true)">حفظ وتحديث الدراسة (يولّد العرض)</button><span id="p-msg"></span></div>`;tot()}
+function tot(){let t={real:0,company:0},c={real:0,company:0};document.querySelectorAll('#p-body td input[data-k]').forEach(e=>{const it=D.items.find(x=>x.label===e.dataset.l);if(e.value!==''){c[e.dataset.k]++;t[e.dataset.k]+=(+e.value)*(it.q1||0)}});
+ const f=x=>x.toLocaleString('en-US',{maximumFractionDigits:0});$('tot').innerHTML=`<span>العرض الحقيقي (تقريبي، من البنود ذات الكمية الثابتة): ${f(t.real)} $ — ${c.real} بند مسعّر</span><span>عرض الشركة: ${f(t.company)} $ — ${c.company} بند مسعّر</span>`}
+function copyReal(){document.querySelectorAll('#p-body input[data-k=real]').forEach(e=>{const o=document.querySelector(`input[data-k=company][data-l="${e.dataset.l}"]`);if(o)o.value=e.value});tot()}
+async function savePrices(upd){const prices={real:{},company:{}},inputs={};
+ document.querySelectorAll('#p-body input[data-k]').forEach(e=>prices[e.dataset.k][e.dataset.l]=e.value===''?null:+e.value);
+ IN.forEach(([k])=>{const v=$('in-'+k).value;inputs[k]=v===''?null:+v});
+ await api('/api/study/save',{name:$('p-st').value,inputs,prices});$('p-msg').innerHTML='<span class="pill">تم الحفظ</span>';
+ if(upd){document.querySelector('[data-p=upd]').click();setTimeout(()=>{$('u-st').value=$('p-st').value;runUpd()},400)}}
+refresh();
+</script></body></html>

@@ -1,0 +1,7 @@
+numpy
+shapely
+openpyxl
+python-docx
+pillow
+matplotlib
+lxml

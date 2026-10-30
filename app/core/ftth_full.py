@@ -31,7 +31,6 @@ def _generic_study(out_root, name, town, gpkg, log):
     cfg = dict(study=name, town_ar=town, file_town=town.strip().replace(' ', '_'), gpkg=gp_name, templates=tpls, baseline=m, standards='aerial_default',
                overrides={}, generic=True, growth={}, reference='قالب BOQ عام: المكونات فقط، الأسعار والأشهر تُدخل لاحقاً. الكميات تُحسب من التصميم.')
     json.dump(cfg, open(os.path.join(tool, 'study.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    shutil.copy(os.path.join(HERE, 'تحديث.bat.template'), os.path.join(tool, 'تحديث.bat'))
     log('   قالب BOQ عام: %s' % '، '.join(tpls))
     return sdir, tool
 
