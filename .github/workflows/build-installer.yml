@@ -27,14 +27,24 @@ jobs:
           Copy-Item README.md stage\README.txt
       - name: Smoke test
         shell: pwsh
+        env:
+          PYTHONUTF8: '1'
+          PYTHONIOENCODING: utf-8
         run: |
           .\stage\python\python.exe -c "import shapely, numpy, openpyxl, docx, PIL, matplotlib, lxml, tkinter; print('imports ok')"
+          if ($LASTEXITCODE -ne 0) { throw 'imports failed' }
           .\stage\python\python.exe stage\app\core\ftth_boq.py -h
-          $p = Start-Process .\stage\python\python.exe -ArgumentList '-X','utf8','stage\app\core\ftth_web.py','--no-window' -RedirectStandardOutput web.out -PassThru
-          Start-Sleep 4
-          $url = (Get-Content web.out | Select-Object -First 1)
-          (Invoke-WebRequest "${url}api/state" -UseBasicParsing).Content
-          Stop-Process $p
+          if ($LASTEXITCODE -ne 0) { throw 'ftth_boq failed' }
+          $p = Start-Process .\stage\python\python.exe -ArgumentList '-X','utf8','stage\app\core\ftth_web.py','--no-window' -RedirectStandardOutput web.out -RedirectStandardError web.err -PassThru
+          $ok = $false
+          foreach ($i in 1..15) {
+            Start-Sleep 2
+            $url = (Get-Content web.out -ErrorAction SilentlyContinue | Select-Object -First 1)
+            if ($url) { try { (Invoke-WebRequest "${url}api/state" -UseBasicParsing).Content; $ok = $true; break } catch { Write-Host $_ } }
+          }
+          Get-Content web.err -ErrorAction SilentlyContinue
+          Stop-Process $p -ErrorAction SilentlyContinue
+          if (-not $ok) { throw 'web server did not answer' }
       - name: Install Inno Setup
         shell: pwsh
         run: choco install innosetup -y --no-progress
