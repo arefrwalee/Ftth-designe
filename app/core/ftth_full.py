@@ -18,10 +18,30 @@ def py_script(script, args):
     return p.wait()
 
 
-def run(inp, name, town, ref_tool, out_root, poles_file=None, log=print):
-    ref_tool = os.path.abspath(ref_tool); out_root = os.path.abspath(out_root)
-    rc = json.load(open(os.path.join(ref_tool, 'study.json'), encoding='utf-8'))
-    ftth_std.load(rc, PKG)
+def _generic_study(out_root, name, town, gpkg, log):
+    """مجلد دراسة جديد بقالب BOQ عام (مكونات فقط، بلا أسعار) يُملأ من التصميم نفسه."""
+    import ftth_boq
+    from ftth_update import read_gpkg, metrics
+    STD = ftth_std.load({'standards': 'aerial_default', 'overrides': {}}, PKG)
+    sdir = os.path.join(out_root, '%s_10y' % name); tool = os.path.join(sdir, 'أداة_التحديث'); os.makedirs(tool, exist_ok=True)
+    gp_name = 'FTTH_%s.gpkg' % name; shutil.copy(gpkg, os.path.join(sdir, gp_name))
+    m = metrics(read_gpkg(os.path.join(sdir, gp_name)))
+    tpls = ftth_boq.create_templates(tool, name, town, m, STD)
+    ftth_boq.prices_template(os.path.join(tool, tpls[0]), os.path.join(tool, 'الأسعار.json'))
+    cfg = dict(study=name, town_ar=town, file_town=town.strip().replace(' ', '_'), gpkg=gp_name, templates=tpls, baseline=m, standards='aerial_default',
+               overrides={}, generic=True, growth={}, reference='قالب BOQ عام: المكونات فقط، الأسعار والأشهر تُدخل لاحقاً. الكميات تُحسب من التصميم.')
+    json.dump(cfg, open(os.path.join(tool, 'study.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    shutil.copy(os.path.join(HERE, 'تحديث.bat.template'), os.path.join(tool, 'تحديث.bat'))
+    log('   قالب BOQ عام: %s' % '، '.join(tpls))
+    return sdir, tool
+
+
+def run(inp, name, town, ref_tool=None, out_root='.', poles_file=None, log=print):
+    out_root = os.path.abspath(out_root)
+    rc = None
+    if ref_tool:
+        ref_tool = os.path.abspath(ref_tool); rc = json.load(open(os.path.join(ref_tool, 'study.json'), encoding='utf-8')); ftth_std.load(rc, PKG)
+    else: ftth_std.load({'standards': 'aerial_default', 'overrides': {}}, PKG)
     sdir = os.path.join(out_root, '%s_10y' % name)
     if os.path.exists(sdir): raise SystemExit('المجلد موجود مسبقاً: ' + sdir)
     tmp = os.path.join(out_root, '_draft_tmp_%s' % name)
@@ -29,9 +49,13 @@ def run(inp, name, town, ref_tool, out_root, poles_file=None, log=print):
     out, stats, issues = ftth_design.generate(inp, tmp, ftth_std.STD, log=log)
     log('   %d سبلتر فرعي، %d رئيسي، كبلات %d م، أعمدة %d (%s)، ملاحظات %d' % (
         stats['secondaries'], stats['primaries'], stats['sub_m'] + stats['main_m'], stats['poles'], stats['poles_source'], stats['issues']))
-    log('== 2/4 إنشاء مجلد الدراسة من قوالب %s' % rc.get('town_ar', rc['study']))
-    code = py_script('new_study.py', ['--name', name, '--town', town, '--gpkg', out, '--from', ref_tool, '--out', out_root])
-    if code != 0: raise SystemExit('فشل إنشاء الدراسة')
+    if rc:
+        log('== 2/4 إنشاء مجلد الدراسة من قوالب %s' % rc.get('town_ar', rc['study']))
+        code = py_script('new_study.py', ['--name', name, '--town', town, '--gpkg', out, '--from', ref_tool, '--out', out_root])
+        if code != 0: raise SystemExit('فشل إنشاء الدراسة')
+    else:
+        log('== 2/4 إنشاء مجلد الدراسة (قالب BOQ عام)')
+        sdir, _ = _generic_study(out_root, name, town, out, log)
     shutil.move(tmp, os.path.join(sdir, 'مسودة_المولد'))
     tool = os.path.join(sdir, 'أداة_التحديث')
     log('== 3/4 الحساب الأولي (BOQ وعرض السعر)')
@@ -48,7 +72,7 @@ def run(inp, name, town, ref_tool, out_root, poles_file=None, log=print):
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument('--input', required=True); ap.add_argument('--name', required=True); ap.add_argument('--town', required=True)
-    ap.add_argument('--from', dest='ref', required=True, help='مجلد أداة_التحديث لدراسة مرجعية'); ap.add_argument('--out', required=True)
+    ap.add_argument('--from', dest='ref', default=None, help='اختياري: مجلد أداة_التحديث لدراسة مرجعية (بدونه يُستعمل قالب BOQ عام)'); ap.add_argument('--out', required=True)
     ap.add_argument('--poles', help='ملف أعمدة المسح (CSV أو gpkg) اختياري')
     a = ap.parse_args(argv)
     run(a.input, a.name, a.town, a.ref, a.out, a.poles)

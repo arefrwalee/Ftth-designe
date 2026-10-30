@@ -115,7 +115,7 @@ def rows_by_label(ws):
     out = {}
     for r in range(5, ws.max_row + 1):
         b = ws.cell(r, 2).value
-        if b and ws.cell(r, 4).value and ws.cell(r, 6).value is not None: out[r] = str(b).split('\n')[0].strip()
+        if b and ws.cell(r, 4).value and ws.cell(r, 5).value is not None: out[r] = str(b).split('\n')[0].strip()
     return out
 def find_row(rows, *keys):
     return next((r for r, t in rows.items() if all(k in t for k in keys)), None)
@@ -325,22 +325,39 @@ def main():
             if bad: print(' تحذير: %d سبلتر فرعي غير موصول بشبكة الكبلات: %s' % (len(bad), '، '.join(map(str, bad[:8]))))
     # 3) BOQ
     if STD['hanging_materials']['mode'] != 'by_cable_length': print('مواد التعليق: تُدخل يدوياً في قالب BOQ ولا تغيّرها الأداة (Hanging materials = manual input).')
+    generic = bool(cfg.get('generic'))
+    prices_all = {}
+    pf = os.path.join(here, 'الأسعار.json')
+    if os.path.exists(pf):
+        try: prices_all = json.load(open(pf, encoding='utf-8'))
+        except Exception as e: print('تنبيه: تعذّرت قراءة الأسعار.json:', e)
     s1 = openpyxl.load_workbook(os.path.join(here, cfg['templates'][0]))['الكميات_الحالية']
     have = set(rows_by_label(s1).values())
     for k, v in me.items():
         m = re.match(r'^([MB])(\d+)$', k)
         if m and v > 0 and mb.get(k, 0) <= 0 and ('كابل %s %s ألياف' % ('رئيسي' if m.group(1) == 'M' else 'فرعي', m.group(2))) not in have:
             print('تنبيه: ظهر كبل %s بعدد ألياف %s ولا يوجد له بند في الجدول، أضفه يدوياً.' % ('رئيسي' if m.group(1) == 'M' else 'فرعي', m.group(2)))
-    comp_path = comp_tpl = comp_q1 = None
+    comp_path = comp_tpl = comp_q1 = None; gen_priced = 0
     for tpl in cfg['templates']:
         dst = os.path.join(out, tpl.replace('.xlsx', '_%s.xlsx' % stamp))
-        q1, q2, info, kept = apply_book(os.path.join(here, tpl), dst, layers, mb, me, me['subs'])
+        if generic:
+            import ftth_boq
+            q1, q2, gm = ftth_boq.refresh_workbook(os.path.join(here, tpl), dst, me, STD, cfg.get('growth'))
+            kind = 'company' if 'الشركة' in tpl else 'real'
+            try:
+                if openpyxl.load_workbook(dst)['مدخلات']['B3'].value in (None, ''): print('  تنبيه: أشهر العمل غير مُدخلة (صفحة مدخلات في القالب). تُدخل بعد خطة التنفيذ.')
+            except Exception: pass
+            pr = {k: v for k, v in (prices_all.get(kind) or {}).items() if isinstance(v, (int, float))}
+            if pr: print('  أسعار %s: طُبّقت على %d بند' % (kind, ftth_boq.apply_prices(dst, dst, pr)))
+            if 'الشركة' in tpl: gen_priced = ftth_boq.priced_total(dst)
+        else:
+            q1, q2, info, kept = apply_book(os.path.join(here, tpl), dst, layers, mb, me, me['subs'])
         print('تم:', os.path.basename(dst))
-        if 'الشركة' in tpl: comp_path, comp_tpl, comp_q1 = dst, os.path.join(here, tpl), q1
+        if 'الشركة' in tpl: comp_path, comp_tpl, comp_q1 = dst, os.path.join(here, tpl), (None if generic else q1)
     print('مع احتياط 20%%: سبلترات رئيسية %d، فرعية %d، كلوجرات %d' % tuple(ceil(x * SP() - 1e-9) for x in (me['KP'], me['K'], me['NC'])))
     print('أطوال الكبلات المطلوبة (م): رئيسية %d، فرعية %d' % (sum(v for k, v in me.items() if re.match(r'^M\d+$', k)), sum(v for k, v in me.items() if re.match(r'^B\d+$', k))))
     # 4) change report
-    if comp_tpl and ex and OUT.get('change_report', True):
+    if comp_tpl and comp_q1 is not None and ex and OUT.get('change_report', True):
         lines, tot, newitems = change_report(comp_tpl, comp_q1, mb, me, os.path.join(out, 'تقرير_التغييرات_%s.xlsx' % stamp))
         print('\n== تقرير التغييرات (مقارنة بالمسلَّم) ==')
         for t, o, n, d, p, dd in sorted(lines, key=lambda x: -abs(x[5]))[:12]: print(' %-34s %9s -> %-9s (%+g) %+10.2f $' % (t[:34], format(o, 'g'), format(n, 'g'), d, dd))
@@ -357,6 +374,8 @@ def main():
             wb.save(comp_path)
         except Exception as e: print('تنبيه: تعذّر تحديث بيانات العرض:', e)
         of = _opt('ftth_offer')
+        if generic and not gen_priced:
+            print('عرض السعر: لم تُدخل الأسعار بعد (الأسعار.json أو الخلايا الصفراء في القالب). أُنتجت الكميات فقط.'); of = None
         if of:
             town = cfg.get('town_ar', cfg['study']); fl = cfg.get('file_town', cfg['study'])
             try:
